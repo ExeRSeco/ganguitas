@@ -19,6 +19,7 @@ const ProductSchema = z.object({
   link_afiliado: z.string().url("El enlace de afiliado debe ser una URL válida (Ej: https://...)"),
   destacado: z.boolean(),
   recomendado: z.boolean(),
+  viral: z.boolean(),
   pros: z.array(z.string()).max(3, "Máximo 3 pros permitidos").optional(),
 });
 
@@ -41,6 +42,7 @@ export default function AdminPage() {
   const [linkAfiliado, setLinkAfiliado] = useState("");
   const [destacado, setDestacado] = useState(false);
   const [recomendado, setRecomendado] = useState(false);
+  const [viral, setViral] = useState(false);
   const [pros, setPros] = useState<string[]>(['', '', '']);
   const [isUploading, setIsUploading] = useState(false);
 
@@ -60,6 +62,7 @@ export default function AdminPage() {
     setLinkAfiliado(product.link_afiliado);
     setDestacado(product.destacado);
     setRecomendado(product.recomendado || false);
+    setViral(product.viral || false);
     setPros(product.pros && product.pros.length > 0 ? [...product.pros, '', '', ''].slice(0, 3) : ['', '', '']);
     // Vaciamos imágenes para que si no sube nada nuevo, conserve las de la DB
     setImagenes([]); 
@@ -68,7 +71,7 @@ export default function AdminPage() {
 
   const resetForm = () => {
     setEditId(null);
-    setTitulo(""); setSlug(""); setDescripcion(""); setPrecio(""); setPrecioRegular(""); setCategoria(""); setImagenes([]); setLinkAfiliado(""); setDestacado(false); setRecomendado(false); setPros(['', '', '']);
+    setTitulo(""); setSlug(""); setDescripcion(""); setPrecio(""); setPrecioRegular(""); setCategoria(""); setImagenes([]); setLinkAfiliado(""); setDestacado(false); setRecomendado(false); setViral(false); setPros(['', '', '']);
   };
 
   useEffect(() => {
@@ -115,6 +118,7 @@ export default function AdminPage() {
         link_afiliado: linkAfiliado,
         destacado,
         recomendado,
+        viral,
         pros: pros.filter(p => p.trim() !== '')
       };
 
@@ -293,14 +297,21 @@ export default function AdminPage() {
                 <div className="flex-1 flex items-center gap-3 bg-gray-50 p-4 rounded-md border border-gray-200">
                   <input type="checkbox" id="destacado" checked={destacado} onChange={e => setDestacado(e.target.checked)} className="w-5 h-5 text-ml-blue rounded border-gray-300 focus:ring-ml-blue" />
                   <label htmlFor="destacado" className="text-sm font-medium text-gray-900 cursor-pointer">
-                    Destacar este producto (Home Superior)
+                    Destacar (Home)
                   </label>
                 </div>
                 
                 <div className="flex-1 flex items-center gap-3 bg-indigo-50 p-4 rounded-md border border-indigo-100">
                   <input type="checkbox" id="recomendado" checked={recomendado} onChange={e => setRecomendado(e.target.checked)} className="w-5 h-5 text-indigo-600 rounded border-gray-300 focus:ring-indigo-600" />
                   <label htmlFor="recomendado" className="text-sm font-medium text-gray-900 cursor-pointer">
-                    🌟 Recomendación de la Semana
+                    🌟 Semanal
+                  </label>
+                </div>
+
+                <div className="flex-1 flex items-center gap-3 bg-red-50 p-4 rounded-md border border-red-100">
+                  <input type="checkbox" id="viral" checked={viral} onChange={e => setViral(e.target.checked)} className="w-5 h-5 text-red-600 rounded border-gray-300 focus:ring-red-600" />
+                  <label htmlFor="viral" className="text-sm font-medium text-gray-900 cursor-pointer">
+                    🔥 Viral (TikTok)
                   </label>
                 </div>
               </div>
@@ -375,19 +386,28 @@ export default function AdminPage() {
                       <td className="px-6 py-4 text-sm text-gray-600">{prod.categoria}</td>
                       <td className="px-6 py-4 text-sm font-medium text-gray-900">${prod.precio.toLocaleString('es-AR')}</td>
                       <td className="px-6 py-4">
-                        {prod.destacado ? (
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        <div className="flex flex-wrap gap-2">
+                        {prod.destacado && (
+                          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
                             Destacado
                           </span>
-                        ) : prod.recomendado ? (
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                        )}
+                        {prod.recomendado && (
+                          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-indigo-100 text-indigo-800">
                             🌟 Semanal
                           </span>
-                        ) : (
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                        )}
+                        {prod.viral && (
+                          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">
+                            🔥 Viral
+                          </span>
+                        )}
+                        {!prod.destacado && !prod.recomendado && !prod.viral && (
+                          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
                             Normal
                           </span>
                         )}
+                        </div>
                       </td>
                       <td className="px-6 py-4 text-right">
                         <span className="text-xs text-gray-500 mr-4">🔥 {prod.views} | 🖱 {prod.clicks}</span>

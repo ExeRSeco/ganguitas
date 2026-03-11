@@ -11,23 +11,26 @@ export default async function Home() {
   // Parallel fetching con Promise.all y manejo de errores
   const [
     { data: gangas, error: errorGangas },
+    { data: ofertas, error: errorOfertas },
     { data: destacadas, error: errorDestacadas },
     { data: virales, error: errorVirales },
     { data: recomendado, error: errorRecomendado }
   ] = await Promise.all([
-    supabase.from('products').select('*').order('created_at', { ascending: false }).limit(4),
+    supabase.from('products').select('*').eq('viral', false).is('precio_regular', null).order('created_at', { ascending: false }).limit(4),
+    supabase.from('products').select('*').eq('viral', false).not('precio_regular', 'is', null).order('created_at', { ascending: false }).limit(4),
     supabase.from('products').select('*').eq('destacado', true).limit(3),
-    supabase.from('products').select('*').order('views', { ascending: false }).limit(4),
+    supabase.from('products').select('*').eq('viral', true).order('created_at', { ascending: false }).limit(4),
     supabase.from('products').select('*').eq('recomendado', true).order('created_at', { ascending: false }).limit(1).maybeSingle()
   ]);
 
-  if (errorGangas || errorDestacadas || errorVirales || errorRecomendado) {
-    console.error("[Homepage] Error fetching data:", { errorGangas, errorDestacadas, errorVirales, errorRecomendado });
+  if (errorGangas || errorOfertas || errorDestacadas || errorVirales || errorRecomendado) {
+    console.error("[Homepage] Error fetching data:", { errorGangas, errorOfertas, errorDestacadas, errorVirales, errorRecomendado });
   }
 
   // Combinar productos para el Schema ItemList (sólo los más relevantes de la home)
   const allHighlightedProducts = [
     ...(destacadas || []),
+    ...(ofertas || []),
     ...(gangas || []),
   ].slice(0, 10); // Límite razonable
 
@@ -120,11 +123,34 @@ export default async function Home() {
         </section>
       )}
 
-      {/* 3. Gangas del día (Desde la DB) */}
+      {/* 3. Gangas con Ofertas */}
+      {ofertas && ofertas.length > 0 && (
+        <section id="ofertas" className="max-w-5xl mx-auto px-4 mb-10 md:mb-16">
+          <h2 className="text-xl md:text-2xl font-bold mb-4 md:mb-6 text-gray-900 flex items-center gap-2">
+            🔥 Gangas con Ofertas
+          </h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 md:gap-4">
+            {ofertas.map((product) => (
+              <ProductCard
+                key={product.id}
+                id={product.id}
+                titulo={product.titulo}
+                imagen={product.imagen}
+                precio_regular={product.precio_regular || undefined}
+                precio={product.precio}
+                link_afiliado={product.link_afiliado}
+                slug={product.slug}
+              />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* 4. Gangas (Generales sin descuento formal) */}
       {gangas && gangas.length > 0 && (
         <section id="gangas" className="max-w-5xl mx-auto px-4 mb-10 md:mb-16">
           <h2 className="text-xl md:text-2xl font-bold mb-4 md:mb-6 text-gray-900 flex items-center gap-2">
-            Gangas de hoy
+            Gangas Recientes
           </h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 md:gap-4">
             {gangas.map((product) => (

@@ -11,6 +11,7 @@ export interface Product {
   link_afiliado: string;
   destacado: boolean;
   recomendado: boolean;
+  viral: boolean;
   pros: string[];
   views: number;
   clicks: number;
