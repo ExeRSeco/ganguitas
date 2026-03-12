@@ -32,7 +32,7 @@ export default function ProductCard({ id, titulo, imagen, precio_regular, precio
         <div className="relative w-full h-full">
           {/* Usamos un div como placeholder si no hay URL real */}
           {imagen.startsWith('http') || imagen.startsWith('/') ? (
-             <Image src={imagen} alt={titulo} fill className="object-contain" />
+             <Image src={imagen} alt={titulo} fill sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw" className="object-contain" />
           ) : (
             <div className="w-full h-full bg-gray-200 flex items-center justify-center rounded-sm text-gray-400 text-xs sm:text-sm">
               [ Imagen ]
