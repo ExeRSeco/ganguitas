@@ -19,11 +19,7 @@ export const metadata: Metadata = {
   keywords: ["ofertas", "gangas", "mercado libre", "descuentos", "chollos", "productos recomendados", "compras inteligentes", "argentina"],
   authors: [{ name: "Ganguitas Team" }],
   creator: "Ganguitas",
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_BASE_URL 
-      ? (process.env.NEXT_PUBLIC_BASE_URL.startsWith('http') ? process.env.NEXT_PUBLIC_BASE_URL : `https://${process.env.NEXT_PUBLIC_BASE_URL}`)
-      : 'https://ganguitas.com'
-  ),
+  metadataBase: new URL('https://ganguitas.com'),
   openGraph: {
     title: "Ganguitas - Ofertas reales y hallazgos en Mercado Libre",
     description: "Productos útiles, ofertas reales y hallazgos recomendados para ti.",
@@ -66,10 +62,10 @@ const jsonLd = {
   "@context": "https://schema.org",
   "@type": "WebSite",
   "name": "Ganguitas",
-  "url": process.env.NEXT_PUBLIC_BASE_URL || "https://ganguitas.com",
+  "url": "https://ganguitas.com",
   "potentialAction": {
     "@type": "SearchAction",
-    "target": `${process.env.NEXT_PUBLIC_BASE_URL || "https://ganguitas.com"}/buscar?q={search_term_string}`,
+    "target": `https://ganguitas.com/buscar?q={search_term_string}`,
     "query-input": "required name=search_term_string"
   }
 };
