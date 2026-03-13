@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import Navbar from "@/components/layout/Navbar";
 import { Toaster } from 'sonner';
+import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
 
 const inter = Inter({
@@ -85,6 +86,7 @@ export default function RootLayout({
         <Navbar />
         {children}
         <Toaster position="bottom-right" richColors />
+        <Analytics />
       </body>
     </html>
   );
