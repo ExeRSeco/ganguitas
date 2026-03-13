@@ -174,7 +174,7 @@ export default function AdminPage() {
     } catch (err: unknown) {
       if (err instanceof z.ZodError) {
         // Zod validation failed
-        toast.error("Datos inválidos: " + (err as any).errors[0].message);
+        toast.error("Datos inválidos: " + err.issues[0].message);
       } else if (err instanceof Error) {
         // Network / Supabase error
         toast.error("Error guardando: " + err.message);
