@@ -4,6 +4,18 @@ import SearchBar from "@/components/ui/SearchBar";
 import { Suspense } from "react";
 import Link from 'next/link';
 import { createClient } from '@/utils/supabase/server';
+import { Sparkles, Flame, Star, Check, Info, Laptop, Home as HomeIcon, Wrench, Car, Zap, TrendingUp } from 'lucide-react';
+
+const getCategoryIcon = (id: string) => {
+  switch (id) {
+    case 'ofertas': return <div className="p-2 bg-red-50 text-red-500 rounded-xl shadow-sm border border-red-100"><Flame className="w-5 h-5 md:w-6 md:h-6" /></div>;
+    case 'tecnologia': return <div className="p-2 bg-blue-50 text-blue-500 rounded-xl shadow-sm border border-blue-100"><Laptop className="w-5 h-5 md:w-6 md:h-6" /></div>;
+    case 'hogar': return <div className="p-2 bg-emerald-50 text-emerald-500 rounded-xl shadow-sm border border-emerald-100"><HomeIcon className="w-5 h-5 md:w-6 md:h-6" /></div>;
+    case 'herramientas': return <div className="p-2 bg-orange-50 text-orange-500 rounded-xl shadow-sm border border-orange-100"><Wrench className="w-5 h-5 md:w-6 md:h-6" /></div>;
+    case 'auto': return <div className="p-2 bg-slate-100 text-slate-600 rounded-xl shadow-sm border border-slate-200"><Car className="w-5 h-5 md:w-6 md:h-6" /></div>;
+    default: return <div className="p-2 bg-gray-50 text-gray-600 rounded-xl shadow-sm border border-gray-200"><Zap className="w-5 h-5 md:w-6 md:h-6" /></div>;
+  }
+};
 
 export default async function Home() {
   const supabase = await createClient();
@@ -24,20 +36,31 @@ export default async function Home() {
       : supabase.from('products').select('*').eq('categoria', cat.id).order('created_at', { ascending: false }).limit(8)
   );
 
+  // First, get the date of the most recent product for the "Hoy" section
+  const { data: latestForHoy } = await supabase.from('products').select('created_at').order('created_at', { ascending: false }).limit(1).maybeSingle();
+  let hoyPromise: any = Promise.resolve({ data: [], error: null });
+
+  if (latestForHoy) {
+    const latestDateStr = latestForHoy.created_at.split('T')[0];
+    hoyPromise = supabase.from('products').select('*').gte('created_at', `${latestDateStr}T00:00:00`).lte('created_at', `${latestDateStr}T23:59:59.999`).order('created_at', { ascending: false }).limit(8);
+  }
+
   const [
+    { data: hoy, error: errorHoy },
     { data: destacadas, error: errorDestacadas },
     { data: virales, error: errorVirales },
     { data: recomendado, error: errorRecomendado },
     ...categoryResults
   ] = await Promise.all([
+    hoyPromise,
     supabase.from('products').select('*').eq('destacado', true).limit(3),
     supabase.from('products').select('*').eq('viral', true).order('created_at', { ascending: false }).limit(4),
     supabase.from('products').select('*').eq('recomendado', true).order('created_at', { ascending: false }).limit(1).maybeSingle(),
     ...categoryPromises
   ]);
 
-  if (errorDestacadas || errorVirales || errorRecomendado) {
-    console.error("[Homepage] Error fetching curated data:", { errorDestacadas, errorVirales, errorRecomendado });
+  if (errorDestacadas || errorVirales || errorRecomendado || errorHoy) {
+    console.error("[Homepage] Error fetching curated data:", { errorDestacadas, errorVirales, errorRecomendado, errorHoy });
   }
 
   // Combinar productos para el Schema ItemList (sólo los más relevantes de la home)
@@ -109,13 +132,57 @@ export default async function Home() {
         </div>
       </section>
 
+      {/* Gangas de Hoy */}
+      {hoy && hoy.length > 0 && (
+        <section className="max-w-5xl mx-auto px-4 mb-10 md:mb-16">
+          <div className="flex justify-between items-end mb-4 md:mb-6">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-blue-50 text-ml-blue rounded-xl shadow-sm border border-blue-100">
+                <Sparkles className="w-5 h-5 md:w-6 md:h-6" />
+              </div>
+              <h2 className="text-xl md:text-2xl font-bold text-gray-900 tracking-tight">
+                Gangas de Hoy
+              </h2>
+            </div>
+            <Link href="/hoy" className="hidden md:inline-flex text-sm font-medium text-ml-blue hover:underline items-center gap-1 mb-1">
+              Ver más <span aria-hidden="true">&rarr;</span>
+            </Link>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 md:gap-4">
+            {hoy.map((product: any) => (
+              <ProductCard
+                key={`hoy-${product.id}`}
+                id={product.id}
+                titulo={product.titulo}
+                imagen={product.imagen || product.imagenes?.[0] || ""}
+                precio_regular={product.precio_regular || undefined}
+                precio={product.precio}
+                link_afiliado={product.link_afiliado}
+                slug={product.slug}
+                destacado={product.destacado}
+              />
+            ))}
+          </div>
+          <div className="mt-6 text-center md:hidden">
+            <Link href="/hoy" className="inline-block w-full py-2.5 bg-white border border-gray-200 text-gray-800 font-medium rounded-xl shadow-sm hover:bg-gray-50 transition-colors">
+              Ver más de hoy
+            </Link>
+          </div>
+        </section>
+      )}
+
       {/* Productos Destacados */}
       {destacadas && destacadas.length > 0 && (
         <section className="max-w-5xl mx-auto px-4 mb-10 md:mb-16">
           <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm border border-gray-100">
-            <h2 className="text-lg md:text-xl font-bold mb-4 md:mb-6 text-gray-900 flex items-center gap-2">
-              Productos Destacados
-            </h2>
+            <div className="flex items-center gap-3 mb-4 md:mb-6">
+              <div className="p-2 bg-amber-50 text-amber-500 rounded-xl shadow-sm border border-amber-100">
+                <Star className="w-5 h-5 md:w-6 md:h-6" />
+              </div>
+              <h2 className="text-lg md:text-xl font-bold text-gray-900 tracking-tight">
+                Productos Destacados
+              </h2>
+            </div>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6">
               {destacadas.map((product) => (
                 <ProductCard
@@ -144,10 +211,13 @@ export default async function Home() {
         return (
           <section key={cat.id} id={`cat-${cat.id}`} className="max-w-5xl mx-auto px-4 mb-10 md:mb-16">
             <div className="flex justify-between items-end mb-4 md:mb-6">
-              <h2 className="text-xl md:text-2xl font-bold text-gray-900 flex items-center gap-2">
-                {cat.id === 'ofertas' ? '🔥 Ofertas' : cat.name}
-              </h2>
-              <Link href={`/categoria/${cat.id}`} className="hidden md:inline-flex text-sm font-medium text-ml-blue hover:underline items-center gap-1">
+              <div className="flex items-center gap-3">
+                {getCategoryIcon(cat.id)}
+                <h2 className="text-xl md:text-2xl font-bold text-gray-900 tracking-tight">
+                  {cat.name}
+                </h2>
+              </div>
+              <Link href={`/categoria/${cat.id}`} className="hidden md:inline-flex text-sm font-medium text-ml-blue hover:underline items-center gap-1 mb-1">
                 Ver más <span aria-hidden="true">&rarr;</span>
               </Link>
             </div>
@@ -179,9 +249,14 @@ export default async function Home() {
       {/* Productos Virales */}
       {virales && virales.length > 0 && (
         <section className="max-w-5xl mx-auto px-4 mb-10 md:mb-16">
-          <h2 className="text-xl md:text-2xl font-bold mb-4 md:mb-6 text-gray-900 flex items-center gap-2">
-            Productos Virales
-          </h2>
+          <div className="flex items-center gap-3 mb-4 md:mb-6">
+            <div className="p-2 bg-purple-50 text-purple-600 rounded-xl shadow-sm border border-purple-100">
+              <TrendingUp className="w-5 h-5 md:w-6 md:h-6" />
+            </div>
+            <h2 className="text-xl md:text-2xl font-bold text-gray-900 tracking-tight">
+              Productos Virales
+            </h2>
+          </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 md:gap-4">
             {virales.map((product) => (
               <ProductCard
@@ -214,7 +289,7 @@ export default async function Home() {
             </Link>
             <div className="w-full md:w-1/2 px-2 md:px-0">
               <span className="inline-flex items-center gap-1 bg-indigo-50 text-indigo-700 text-xs font-bold px-3 py-1.5 rounded-full mb-3 uppercase tracking-wider">
-                🌟 Recomendación de la semana
+                <Star className="w-3.5 h-3.5 fill-current" /> Recomendación de la semana
               </span>
               <h2 className="text-xl md:text-3xl font-bold text-gray-900 mb-2 md:mb-3 leading-tight">
                 <Link href={`/producto/${recomendado.slug}`} className="hover:text-blue-600 transition-colors">
@@ -234,13 +309,13 @@ export default async function Home() {
                 {recomendado.pros && recomendado.pros.length > 0 ? (
                   recomendado.pros.map((pro: string, idx: number) => (
                     <div key={idx} className="flex gap-3 items-start">
-                      <span className="text-indigo-500 font-bold mt-0.5 shrink-0">✓</span>
+                      <Check className="w-4 h-4 text-indigo-500 font-bold mt-0.5 shrink-0" />
                       <p className="text-gray-700">{pro}</p>
                     </div>
                   ))
                 ) : (
                   <div className="flex gap-3">
-                    <span className="text-indigo-500 font-bold mt-0.5 shrink-0">ℹ️</span>
+                    <Info className="w-5 h-5 text-indigo-500 font-bold mt-0.5 shrink-0" />
                     <p className="text-gray-700"><strong>Por qué vale la pena:</strong> {recomendado.descripcion || "Un excelente producto con gran relación calidad-precio ideal para añadir a tu rutina diaria."}</p>
                   </div>
                 )}
