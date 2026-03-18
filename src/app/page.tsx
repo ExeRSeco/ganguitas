@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import Link from 'next/link';
 import { createClient } from '@/utils/supabase/server';
 import { Sparkles, Flame, Star, Check, Info, Laptop, Home as HomeIcon, Wrench, Car, Zap, TrendingUp } from 'lucide-react';
+import type { Product } from '@/types/product';
 
 const getCategoryIcon = (id: string) => {
   switch (id) {
@@ -38,11 +39,11 @@ export default async function Home() {
 
   // First, get the date of the most recent product for the "Hoy" section
   const { data: latestForHoy } = await supabase.from('products').select('created_at').order('created_at', { ascending: false }).limit(1).maybeSingle();
-  let hoyPromise: any = Promise.resolve({ data: [], error: null });
+  let hoyPromise: Promise<{ data: Product[] | null, error: any }> = Promise.resolve({ data: [], error: null });
 
   if (latestForHoy) {
     const latestDateStr = latestForHoy.created_at.split('T')[0];
-    hoyPromise = supabase.from('products').select('*').gte('created_at', `${latestDateStr}T00:00:00`).lte('created_at', `${latestDateStr}T23:59:59.999`).order('created_at', { ascending: false }).limit(8);
+    hoyPromise = supabase.from('products').select('*').gte('created_at', `${latestDateStr}T00:00:00`).lte('created_at', `${latestDateStr}T23:59:59.999`).order('created_at', { ascending: false }).limit(8) as unknown as Promise<{ data: Product[] | null, error: any }>;
   }
 
   const [
@@ -149,7 +150,7 @@ export default async function Home() {
             </Link>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 md:gap-4">
-            {hoy.map((product: any) => (
+            {hoy.map((product: Product) => (
               <ProductCard
                 key={`hoy-${product.id}`}
                 id={product.id}

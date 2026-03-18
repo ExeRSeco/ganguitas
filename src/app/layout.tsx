@@ -10,6 +10,8 @@ const inter = Inter({
   subsets: ["latin"],
 });
 
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://ganguitas.com';
+
 export const metadata: Metadata = {
   title: {
     template: "%s | Ganguitas",
@@ -19,7 +21,7 @@ export const metadata: Metadata = {
   keywords: ["ofertas", "gangas", "mercado libre", "descuentos", "chollos", "productos recomendados", "compras inteligentes", "argentina"],
   authors: [{ name: "Ganguitas Team" }],
   creator: "Ganguitas",
-  metadataBase: new URL('https://ganguitas.com'),
+  metadataBase: new URL(baseUrl),
   openGraph: {
     title: "Ganguitas - Ofertas reales y hallazgos en Mercado Libre",
     description: "Productos útiles, ofertas reales y hallazgos recomendados para ti.",
@@ -62,10 +64,10 @@ const jsonLd = {
   "@context": "https://schema.org",
   "@type": "WebSite",
   "name": "Ganguitas",
-  "url": "https://ganguitas.com",
+  "url": baseUrl,
   "potentialAction": {
     "@type": "SearchAction",
-    "target": `https://ganguitas.com/buscar?q={search_term_string}`,
+    "target": `${baseUrl}/buscar?q={search_term_string}`,
     "query-input": "required name=search_term_string"
   }
 };

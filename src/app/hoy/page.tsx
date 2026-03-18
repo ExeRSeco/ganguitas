@@ -1,6 +1,7 @@
 import ProductCard from "@/components/ui/ProductCard";
 import { createClient } from "@/utils/supabase/server";
 import { Sparkles, PackageOpen } from "lucide-react";
+import type { Product } from "@/types/product";
 
 export const metadata = {
   title: "Gangas de Hoy",
@@ -18,7 +19,7 @@ export default async function HoyPage() {
     .limit(1)
     .maybeSingle();
 
-  let products: any[] = [];
+  let products: Product[] = [];
   
   if (latest) {
     const latestDateStr = latest.created_at.split('T')[0];

@@ -3,8 +3,8 @@ import { createClient } from '@/utils/supabase/server'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const supabase = await createClient()
-  // Si Vercel inyecta su propio dominio como base, el sitemap se rechaza en GSC. Forzamos el dominio principal.
-  const baseUrl = 'https://ganguitas.com'
+  // Usamos el entorno para que funcione bien en desarrollo y producción
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://ganguitas.com'
 
   // Fetch all active products
   const { data: products } = await supabase
