@@ -29,12 +29,10 @@ export default async function CategoryPage({ params }: Props) {
 
   const supabase = await createClient();
 
-  const { data: products, error } = await supabase
-    .from("products")
-    .select("*")
-    .eq("categoria", slug)
-    .order("created_at", { ascending: false })
-    .limit(50);
+  const { data: products, error } = await (slug === "ofertas"
+    ? supabase.from("products").select("*").not("precio_regular", "is", null).order("created_at", { ascending: false }).limit(50)
+    : supabase.from("products").select("*").eq("categoria", slug).order("created_at", { ascending: false }).limit(50)
+  );
 
   if (error) {
     console.error("Error fetching category products", error);
