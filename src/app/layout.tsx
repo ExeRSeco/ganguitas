@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import Script from 'next/script';
 import { Inter } from "next/font/google";
 import Navbar from "@/components/layout/Navbar";
+import Footer from "@/components/layout/Footer";
 import { Toaster } from 'sonner';
 import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
@@ -10,26 +12,26 @@ const inter = Inter({
   subsets: ["latin"],
 });
 
-const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://ganguitas.com';
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://ganguitas.vercel.app';
 
 export const metadata: Metadata = {
   title: {
     template: "%s | Ganguitas",
-    default: "Ganguitas - Ofertas reales y hallazgos en Mercado Libre",
+    default: "Ganguitas | Productos virales y ofertas de Mercado Libre",
   },
-  description: "Descubre los mejores chollos, gangas y productos recomendados con descuentos reales en Mercado Libre. Reseñamos para que compres inteligente.",
-  keywords: ["ofertas", "gangas", "mercado libre", "descuentos", "chollos", "productos recomendados", "compras inteligentes", "argentina"],
+  description: "Productos virales que realmente valen la pena. Gadgets, herramientas y cosas útiles que puedes comprar en Mercado Libre.",
+  keywords: ["productos virales", "gadgets utiles", "ofertas mercado libre", "cosas utiles para casa", "gadgets baratos", "productos tendencia argentina"],
   authors: [{ name: "Ganguitas Team" }],
   creator: "Ganguitas",
   metadataBase: new URL(baseUrl),
   openGraph: {
-    title: "Ganguitas - Ofertas reales y hallazgos en Mercado Libre",
-    description: "Productos útiles, ofertas reales y hallazgos recomendados para ti.",
-    url: "/",
+    title: "Ganguitas | Productos virales de Mercado Libre",
+    description: "Descubre gadgets útiles, productos virales y ofertas que realmente valen la pena.",
+    url: "https://ganguitas.vercel.app",
     siteName: "Ganguitas",
     images: [
       {
-        url: "/og-image.jpg", // Asegúrate de o bien crear este archivo en public/ o quitarlo si no tienes imagen default
+        url: "https://ganguitas.vercel.app/og-image.jpg", // Asegúrate de o bien crear este archivo en public/ o quitarlo si no tienes imagen default
         width: 1200,
         height: 630,
         alt: "Ganguitas - Las mejores gangas",
@@ -40,8 +42,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Ganguitas - Ofertas reales y hallazgos",
-    description: "Descubre chollos y gangas con descuentos reales recomendados.",
+    title: "Ganguitas | Productos virales y ofertas de Mercado Libre",
+    description: "Productos virales que realmente valen la pena. Gadgets, herramientas y cosas útiles que puedes comprar en Mercado Libre.",
     images: ["/og-image.jpg"],
   },
   robots: {
@@ -80,12 +82,14 @@ export default function RootLayout({
   return (
     <html lang="es" className="scroll-smooth">
       <body className={`${inter.variable} antialiased bg-background text-foreground`}>
-        <script
+        <Script
+          id="global-json-ld"
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
         <Navbar />
         {children}
+        <Footer />
         <Toaster position="bottom-right" richColors />
         <Analytics />
       </body>

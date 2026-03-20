@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { TrendingUp, Cpu } from 'lucide-react';
 
 export default function Navbar() {
   return (
@@ -13,8 +14,14 @@ export default function Navbar() {
 
         {/* Links y Admin */}
         <div className="flex items-center gap-3 sm:gap-6 text-xs sm:text-sm font-medium text-gray-800">
-          <Link href="/#gangas" className="hover:text-black transition-colors whitespace-nowrap">Ofertas</Link>
-          <Link href="/#categorias" className="hover:text-black transition-colors whitespace-nowrap">Categorías</Link>
+          <Link href="/productos-virales" className="flex items-center gap-1 hover:text-black transition-colors whitespace-nowrap">
+            <TrendingUp className="w-4 h-4 text-purple-600" /> Virales
+          </Link>
+          <Link href="/gadgets-utiles" className="flex items-center gap-1 hover:text-black transition-colors whitespace-nowrap">
+            <Cpu className="w-4 h-4 text-blue-500" /> Gadgets
+          </Link>
+          <Link href="/#gangas" className="hover:text-black transition-colors whitespace-nowrap hidden sm:inline-block">Ofertas</Link>
+          <Link href="/#categorias" className="hover:text-black transition-colors whitespace-nowrap hidden sm:inline-block">Categorías</Link>
           
           {/* Admin Icon */}
           <Link href="/admin" className="text-gray-800 hover:text-black transition-colors p-1.5 sm:p-2 rounded-full hover:bg-black/5" aria-label="Admin Dashboard">

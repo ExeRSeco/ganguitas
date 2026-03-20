@@ -3,6 +3,7 @@ import ProductCard from "@/components/ui/ProductCard";
 import SearchBar from "@/components/ui/SearchBar";
 import { Suspense } from "react";
 import Link from 'next/link';
+import Script from 'next/script';
 import { createClient } from '@/utils/supabase/server';
 import { Sparkles, Flame, Star, Check, Info, Laptop, Home as HomeIcon, Wrench, Car, Zap, TrendingUp } from 'lucide-react';
 import type { Product } from '@/types/product';
@@ -93,7 +94,8 @@ export default async function Home() {
 
   return (
     <div className="min-h-screen bg-gray-50 text-foreground pb-20">
-      <script
+      <Script
+        id="home-json-ld"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
@@ -123,11 +125,19 @@ export default async function Home() {
           </div>
         </Suspense>
 
-        {/* Carrusel horizontal táctil para categorías */}
+        {/* Carrusel horizontal táctil para categorías y páginas SEO */}
         <div className="mt-8 flex overflow-x-auto gap-2 md:gap-3 justify-start sm:justify-center pb-4 hide-scrollbar px-1 snap-x">
-          {categoriesToFetch.map((cat) => (
-            <Link key={cat.id} href={`/categoria/${cat.id}`} className="shrink-0 snap-start px-4 py-2 bg-white border border-gray-200 text-gray-700 text-sm font-medium rounded-full hover:bg-gray-50 hover:border-gray-300 transition-colors shadow-sm">
-              {cat.name}
+          {[
+            { name: "Productos Virales", href: "/productos-virales", icon: <TrendingUp className="w-4 h-4 text-purple-600" /> },
+            { name: "Mejores Ofertas", href: "/ofertas-mercado-libre", icon: <Flame className="w-4 h-4 text-red-500" /> },
+            { name: "Gadgets Útiles", href: "/gadgets-utiles", icon: <Laptop className="w-4 h-4 text-blue-500" /> },
+            { name: "Casa Inteligente", href: "/productos-para-casa", icon: <HomeIcon className="w-4 h-4 text-emerald-500" /> },
+            { name: "Accesorios Auto", href: "/productos-para-auto", icon: <Car className="w-4 h-4 text-slate-500" /> },
+            { name: "Herramientas", href: "/categoria/herramientas", icon: <Wrench className="w-4 h-4 text-orange-500" /> },
+          ].map((link) => (
+            <Link key={link.name} href={link.href} className="flex items-center gap-1.5 shrink-0 snap-start px-4 py-2 bg-white border border-gray-200 text-gray-700 text-sm font-medium rounded-full hover:bg-gray-50 hover:border-gray-300 transition-colors shadow-sm">
+              {link.icon}
+              {link.name}
             </Link>
           ))}
         </div>
