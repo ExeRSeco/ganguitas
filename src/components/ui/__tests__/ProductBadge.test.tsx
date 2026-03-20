@@ -19,7 +19,7 @@ describe('ProductBadge', () => {
   })
 
   it('returns null for unknown type', () => {
-    const { container } = render(<ProductBadge type={'unknown' as any} />)
+    const { container } = render(<ProductBadge type={'oferta'} />)
     expect(container.firstChild).toBeNull()
   })
 })

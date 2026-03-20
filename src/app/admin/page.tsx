@@ -76,6 +76,7 @@ export default function AdminPage() {
 
   useEffect(() => {
     fetchProducts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleSignOut = async () => {
@@ -91,8 +92,8 @@ export default function AdminPage() {
         if (error) throw new Error(error.message);
         toast.success("Producto eliminado exitosamente");
         fetchProducts(); // Refrescar la lista
-      } catch (error: any) {
-        toast.error("Error al eliminar: " + error.message);
+      } catch (error) {
+        toast.error("Error al eliminar: " + (error instanceof Error ? error.message : "Desconocido"));
       }
     }
   };

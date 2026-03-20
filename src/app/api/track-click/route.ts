@@ -4,7 +4,6 @@ import { cookies } from 'next/headers';
 
 export async function POST(request: Request) {
   try {
-    const ip = request.headers.get('x-forwarded-for') || 'unknown-ip';
     const body = await request.json();
     const { productId } = body;
 
@@ -18,7 +17,6 @@ export async function POST(request: Request) {
     
     if (clickCookie) {
       // Ya hizo clic recientemente, evitamos saturar Supabase con escrituras zombie
-      console.log(`[Tracking] Clic omitido por Rate Limit (Cookie) para IP: ${ip}, Prod: ${productId}`);
       return NextResponse.json({ success: true, message: 'Clic registrado (cached)' });
     }
 
@@ -31,8 +29,6 @@ export async function POST(request: Request) {
     if (error) {
        console.error("Error al incrementar click", error);
        return NextResponse.json({ error: 'Error interno de base de datos' }, { status: 500 });
-    } else {
-       console.log(`[Tracking] Clic registrado en BD para el producto: ${productId}`);
     }
 
     // Marcar que esta sesión ya hizo clic para evitar bots o spam de clics repetitivos (Cooldown 60 segundos)

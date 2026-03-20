@@ -3,6 +3,7 @@ import ProductCard from "@/components/ui/ProductCard";
 import SearchBar from "@/components/ui/SearchBar";
 import { Suspense } from "react";
 import Link from 'next/link';
+import Image from 'next/image';
 import Script from 'next/script';
 import { createClient } from '@/utils/supabase/server';
 import { Sparkles, Flame, Star, Check, Info, Laptop, Home as HomeIcon, Wrench, Car, Zap, TrendingUp } from 'lucide-react';
@@ -40,11 +41,11 @@ export default async function Home() {
 
   // First, get the date of the most recent product for the "Hoy" section
   const { data: latestForHoy } = await supabase.from('products').select('created_at').order('created_at', { ascending: false }).limit(1).maybeSingle();
-  let hoyPromise: Promise<{ data: Product[] | null, error: any }> = Promise.resolve({ data: [], error: null });
+  let hoyPromise: Promise<{ data: Product[] | null, error: unknown }> = Promise.resolve({ data: [], error: null });
 
   if (latestForHoy) {
     const latestDateStr = latestForHoy.created_at.split('T')[0];
-    hoyPromise = supabase.from('products').select('*').gte('created_at', `${latestDateStr}T00:00:00`).lte('created_at', `${latestDateStr}T23:59:59.999`).order('created_at', { ascending: false }).limit(8) as unknown as Promise<{ data: Product[] | null, error: any }>;
+    hoyPromise = supabase.from('products').select('*').gte('created_at', `${latestDateStr}T00:00:00`).lte('created_at', `${latestDateStr}T23:59:59.999`).order('created_at', { ascending: false }).limit(8) as unknown as Promise<{ data: Product[] | null, error: unknown }>;
   }
 
   const [
@@ -293,7 +294,7 @@ export default async function Home() {
           <div className="max-w-4xl mx-auto px-4 flex flex-col md:flex-row gap-5 md:gap-8 items-center">
             <Link href={`/producto/${recomendado.slug}`} className="relative w-full md:w-1/2 bg-gray-50 aspect-square rounded-lg flex items-center justify-center p-4 hover:opacity-90 transition-opacity mx-4 md:mx-0 border border-gray-100 overflow-hidden">
               {(recomendado.imagen && (recomendado.imagen.startsWith('http') || recomendado.imagen.startsWith('/'))) || (recomendado.imagenes && recomendado.imagenes[0]) ? (
-                <img src={recomendado.imagen || recomendado.imagenes?.[0]} alt={recomendado.titulo} className="w-full h-full object-contain" />
+                <Image src={recomendado.imagen || recomendado.imagenes?.[0] || ""} alt={recomendado.titulo} fill sizes="(max-width: 768px) 100vw, 50vw" className="object-contain p-4" />
               ) : (
                 <span className="text-gray-400 text-sm md:text-base">[ Imagen Destacado ]</span>
               )}

@@ -1,4 +1,3 @@
-import Image from "next/image";
 import AffiliateButton from "@/components/ui/AffiliateButton";
 import ProductBadge from "@/components/ui/ProductBadge";
 import ProductCard from "@/components/ui/ProductCard";
@@ -91,7 +90,7 @@ export default async function ProductPage({ params }: Props) {
     "aggregateRating": {
       "@type": "AggregateRating",
       "ratingValue": "5.0",
-      "reviewCount": product.views > 0 ? product.views : Math.floor(Math.random() * 50) + 1  // Simulado basado en vistas
+      "reviewCount": product.views > 0 ? product.views : 15
     }
   };
 

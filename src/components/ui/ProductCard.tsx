@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import AffiliateButton from './AffiliateButton';
-import ProductBadge, { BadgeType } from './ProductBadge';
+import ProductBadge from './ProductBadge';
 
 interface ProductCardProps {
   id?: string;
